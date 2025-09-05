@@ -1,12 +1,15 @@
+# MIT License
+#
+# Copyright (c) 2019-present Dan <https://github.com/delivrance>
+# (License text omitted for brevity)
+
+import os
+import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
 from pyrogram import Client, idle
-import asyncio
-
-# Your Telegram API credentials
-API_ID = 25519039
-API_HASH = "1890ea8e01f2824e5827ee07cb6c51d3"
-BOT_TOKEN = "8413663158:AAE1YZH5DPOPS_x3z4zCzsFm3HtOMJW-AJQ"
+import tgcrypto
+from pyromod import listen
 
 # Logging setup
 LOGGER = logging.getLogger(__name__)
@@ -15,31 +18,38 @@ logging.basicConfig(
     format="%(name)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S",
     handlers=[
-        RotatingFileHandler("log.txt", maxBytes=5000000, backupCount=10),
+        RotatingFileHandler("log.txt", maxBytes=5_000_000, backupCount=10),
         logging.StreamHandler(),
     ],
 )
+
+# Auth Users from environment variable (comma-separated IDs)
+AUTH_USERS = [int(uid) for uid in os.environ.get("AUTH_USERS", "").split(",") if uid]
+
+# Command prefixes
+prefixes = ["/", "~", "?", "!"]
 
 # Plugins directory
 plugins = dict(root="plugins")
 
 # Initialize Bot Client
 bot = Client(
-    "extract17_bot",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN,
+    "StarkBot",
+    bot_token=os.environ.get("BOT_TOKEN"),
+    api_id=int(os.environ.get("API_ID")),
+    api_hash=os.environ.get("API_HASH"),
     sleep_threshold=20,
     plugins=plugins,
-    workers=50
+    workers=5  # reduced for free dyno limits
 )
 
 async def main():
     await bot.start()
     bot_info = await bot.get_me()
-    LOGGER.info(f"🚀 Bot started as @{bot_info.username}")
+    LOGGER.info(f"<--- @{bot_info.username} Started (c) STARKBOT --->")
     await idle()
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())
-    LOGGER.info("🛑 Bot stopped.")
+    LOGGER.info(f"<---Bot Stopped--->")
+
