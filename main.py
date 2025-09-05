@@ -20,51 +20,43 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE
 
+
 import logging
 import asyncio
-from config import Config
-from pyrogram import Client, idle
-import tgcrypto
-from pyromod import listen
 from logging.handlers import RotatingFileHandler
+from pyrogram import Client, idle
 
+# Logger setup
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
     format="%(name)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S",
     handlers=[
-        RotatingFileHandler(
-            "log.txt", maxBytes=5000000, backupCount=10
-        ),
+        RotatingFileHandler("log.txt", maxBytes=5000000, backupCount=10),
         logging.StreamHandler(),
     ],
 )
 
-# Auth Users
-AUTH_USERS = [int(chat) for chat in Config.AUTH_USERS.split(",") if chat != ""]
+# Bot token (from BotFather)
+BOT_TOKEN = "8413663158:AAGWgLfNUji2l7weqw5JODMoA9ftL9XBWYo"
 
-# Prefixes
-prefixes = ["/", "~", "?", "!"]
-
+# Plugin directory
 plugins = dict(root="plugins")
 
 if __name__ == "__main__":
     bot = Client(
         "StarkBot",
-        bot_token="8413663158:AAGWgLfNUji2l7weqw5JODMoA9ftL9XBWYo",  # ✅ Direct Bot Token
-        api_id=25519039,                                           # ✅ Direct API ID
-        api_hash="1890ea8e01f2824e5827ee07cb6c51d3",               # ✅ Direct API Hash
-        sleep_threshold=20,
+        bot_token=BOT_TOKEN,
         plugins=plugins,
-        workers=50,
+        workers=50
     )
 
     async def main():
         await bot.start()
         bot_info = await bot.get_me()
-        LOGGER.info(f"<--- @{bot_info.username} Started (c) STARKBOT --->")
+        LOGGER.info(f"<--- @{bot_info.username} Started --->")
         await idle()
 
     asyncio.get_event_loop().run_until_complete(main())
-    LOGGER.info(f"<--- Bot Stopped --->")
+    LOGGER.info("<--- Bot Stopped --->")
